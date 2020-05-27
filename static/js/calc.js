@@ -1,20 +1,29 @@
-    var nomes_guerra;
-    if (document.getElementById("nome_guerra")!="") {
-        var HttpNomeGuerra = new XMLHttpRequest();
-        //TODO: Definir como se dará o request. Simulando com um JSON
-        HttpNomeGuerra.open("GET", '/nomes_guerra/static/js/dados.js');
-        HttpNomeGuerra.responseType="text";
-        HttpNomeGuerra.send();
+    function removerAcentos(s) {
+        return s.normalize('NFD').replace(/[\u0300-\u036f]/g, "")
+    }
 
-        HttpNomeGuerra.onreadystatechange = (e) => {
-              nomes_guerra = JSON.parse(HttpNomeGuerra.responseText);
+        //Requisição AJAX
+        var nomes_guerra;
+        if (document.getElementById("nome_guerra")!="") {
+            var HttpNomeGuerra = new XMLHttpRequest();
+            //TODO: Definir como se dará o request. Simulando com um JSON
+            HttpNomeGuerra.open("GET", '/nomes_guerra/static/js/dados.js');
+            HttpNomeGuerra.responseType="text";
+            HttpNomeGuerra.send();
+
+            HttpNomeGuerra.onreadystatechange = (e) => {
+                  nomes_guerra = JSON.parse(HttpNomeGuerra.responseText);
+                  nomes_guerra = nomes_guerra.map(function (num) {return removerAcentos(num)})
+            }
          }
-     }
+
     function createAlias() {
+        //Definição de variáveis
         var arr_names = [];
         var arr_obj = [];
         var select_box = document.getElementById("nome_guerra");
         var full_name = document.getElementById("nome_completo").value;
+
 
         //Limpar caixa de seleção
         select_box.innerHTML = ""
@@ -52,7 +61,7 @@
             }
         }
         arr_names.forEach(name => {
-            if (!nomes_guerra.includes(name)) {
+            if (!nomes_guerra.includes(removerAcentos(name))) {
                 select_box.options[select_box.options.length] = new Option (name)
             }
         })
